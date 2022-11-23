@@ -3,14 +3,17 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-import mlp.data_providers as data_providers
 from pytorch_mlp_framework.arg_extractor import get_args
 from pytorch_mlp_framework.experiment_builder import ExperimentBuilder
 from pytorch_mlp_framework.model_architectures import *
 import os 
 # os.environ["CUDA_VISIBLE_DEVICES"]="0"
+import sys
+sys.path.append('/Users/northarbour/Desktop/认知科学/MLP/mlpractical')
+import mlp.data_providers as data_providers
 
 args = get_args()  # get arguments from command line
+print('args',args)
 rng = np.random.RandomState(seed=args.seed)  # set the seeds for the experiment
 torch.manual_seed(seed=args.seed)  # sets pytorch's seed
 
