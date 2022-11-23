@@ -3,17 +3,14 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
+import mlp.data_providers as data_providers
 from pytorch_mlp_framework.arg_extractor import get_args
 from pytorch_mlp_framework.experiment_builder import ExperimentBuilder
 from pytorch_mlp_framework.model_architectures import *
 import os 
 # os.environ["CUDA_VISIBLE_DEVICES"]="0"
-import sys
-sys.path.append('/Users/northarbour/Desktop/认知科学/MLP/mlpractical')
-import mlp.data_providers as data_providers
 
 args = get_args()  # get arguments from command line
-print('args',args)
 rng = np.random.RandomState(seed=args.seed)  # set the seeds for the experiment
 torch.manual_seed(seed=args.seed)  # sets pytorch's seed
 
@@ -40,9 +37,11 @@ test_data = data_providers.CIFAR100(root='data', set_name='test',
                  transform=transform_test,
                  download=True)  # initialize our rngs using the argument set seed
 
-train_data_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
-val_data_loader = DataLoader(val_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
-test_data_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, num_workers=4)
+train_data_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=0)
+val_data_loader = DataLoader(val_data, batch_size=args.batch_size, shuffle=True, num_workers=0)
+test_data_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, num_workers=0)
+
+print('Success')
 
 if args.block_type == 'conv_block':
     processing_block_type = ConvolutionalProcessingBlock
@@ -50,6 +49,9 @@ if args.block_type == 'conv_block':
 elif args.block_type == 'empty_block':
     processing_block_type = EmptyBlock
     dim_reduction_block_type = EmptyBlock
+elif args.block_type == 'resConv_block':
+    processing_block_type = ConvolutionalProcessingBlockBN
+    dim_reduction_block_type = ConvolutionalDimensionalityReductionBlockBN
 else:
     raise ModuleNotFoundError
 
@@ -67,5 +69,6 @@ conv_experiment = ExperimentBuilder(network_model=custom_conv_net,
                                     use_gpu=args.use_gpu,
                                     continue_from_epoch=args.continue_from_epoch,
                                     train_data=train_data_loader, val_data=val_data_loader,
-                                    test_data=test_data_loader)  # build an experiment object
+                                    test_data=test_data_loader,
+                                    learning_rate=args.learning_rate)  # build an experiment object
 experiment_metrics, test_metrics = conv_experiment.run_experiment()  # run experiment and return experiment metrics
