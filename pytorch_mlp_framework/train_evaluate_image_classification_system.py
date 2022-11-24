@@ -41,7 +41,6 @@ train_data_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=T
 val_data_loader = DataLoader(val_data, batch_size=args.batch_size, shuffle=True, num_workers=0)
 test_data_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, num_workers=0)
 
-print('Success')
 
 if args.block_type == 'conv_block':
     processing_block_type = ConvolutionalProcessingBlock
