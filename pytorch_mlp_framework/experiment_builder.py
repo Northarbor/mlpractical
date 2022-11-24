@@ -136,7 +136,7 @@ class ExperimentBuilder(nn.Module):
         plt.title("Gradient flow")
         plt.grid(True)
         plt.tight_layout()
-        
+        print('Jiayan Liu')
         return plt
         
     
@@ -144,17 +144,21 @@ class ExperimentBuilder(nn.Module):
         """
         The function is being called in Line 298 of this file. 
         Receives the parameters of the model being trained. Returns plot of gradient flow for the given model parameters.
-       
-        """
-        all_grads = []
-        layers = []
-        
-        """
+
         Complete the code in the block below to collect absolute mean of the gradients for each layer in all_grads with the             layer names in layers.
         """
         ########################################
         
-        
+        all_grads = []
+        layers = []
+        for name, parameter in named_parameters:
+            if(parameter.requires_grad) and ('bias' not in name):
+                nameList=name.split('.')
+                if len(nameList)==5:
+                    layers.append(nameList[1]+'_'+nameList[3])
+                else:
+                    layers.append(nameList[1]+'_'+nameList[0])
+                all_grads.append(parameter.grad.abs().mean())
         ########################################
             
         
@@ -294,6 +298,10 @@ class ExperimentBuilder(nn.Module):
             ################################################################
             ##### Plot Gradient Flow at each Epoch during Training  ######
             print("Generating Gradient Flow Plot at epoch {}".format(epoch_idx))
+            print('model',self.model)
+            for name, parameters in self.model.named_parameters():
+                print('name:', name)
+
             plt = self.plot_grad_flow(self.model.named_parameters())
             if not os.path.exists(os.path.join(self.experiment_saved_models, 'gradient_flow_plots')):
                 os.mkdir(os.path.join(self.experiment_saved_models, 'gradient_flow_plots'))
